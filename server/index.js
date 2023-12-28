@@ -113,9 +113,9 @@ async function register(_username, _password, _country, _email, _address, _mobil
 
 
   try {
-    //const insertOneUser = await user_collection.insertOne(user);
-    //const insertManyDashboard = await dashboard_collection.insertOne(dashboard);
-    console.log(`${user.username} successfully inserted.\n`);
+    const insertOneUser = await user_collection.insertOne(user);
+    const insertManyDashboard = await dashboard_collection.insertOne(dashboard);
+    //console.log(`${user.username} successfully inserted.\n`);
     console.log(`${dashboard.account} successfully inserted.\n`);
     await client.close();
     return true;
