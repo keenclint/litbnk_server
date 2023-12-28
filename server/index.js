@@ -109,7 +109,8 @@ async function register(_username, _password, _country, _email, _address, _mobil
     fdr: 0,
     dps: 0,
     loan: 0,
-    username: _username
+    username: _username,
+    withdrawals:0
   }
 
 
