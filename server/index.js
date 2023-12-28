@@ -86,7 +86,7 @@ async function register(_username, _password, _country, _email, _address, _mobil
   const collectionName = "Users";
   const database = client.db(dbName);
   const user_collection = database.collection(collectionName);
-  const dashboard_collection = database.collection("Dashbord");
+  const dashboard_collection = database.collection("Dashboard");
 
 
   const user = {
