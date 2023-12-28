@@ -18,8 +18,8 @@ async function getDashBoard(_username){
     
   const client = new MongoClient(uri);
   await client.connect();
-  const dbName = "Collector";
-  const collectionName = "Packages";
+  const dbName = "Bankers";
+  const collectionName = "Dashboard";
 
   const database = client.db(dbName);
   const collection = database.collection(collectionName);
@@ -30,7 +30,7 @@ async function getDashBoard(_username){
     const findOneResult = await collection.findOne(findOneQuery);
     if (findOneResult === null) {
       console.log(
-        `Couldn't find any package that contain ${_id} as an name.\n`
+        `Couldn't find any package that contain ${_username} as an name.\n`
       );
     } else {
       console.log(`Found a recipe with 'potato' as an ingredient:\n${JSON.stringify(findOneResult) }\n`)
