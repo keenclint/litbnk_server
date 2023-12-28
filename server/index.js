@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-async function getDashBoard(_id){
+async function getDashBoard(_username){
     const uri = process.env.uri;
     
   const client = new MongoClient(uri);
@@ -24,7 +24,7 @@ async function getDashBoard(_id){
   const database = client.db(dbName);
   const collection = database.collection(collectionName);
 
-  const findOneQuery = { id: _id };
+  const findOneQuery = { username: _username };
 
   try {
     const findOneResult = await collection.findOne(findOneQuery);
@@ -109,6 +109,7 @@ async function register(_username, _password, _country, _email, _address, _mobil
     fdr: 0,
     dps: 0,
     loan: 0,
+    username: _username
   }
 
 
