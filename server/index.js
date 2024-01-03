@@ -24,23 +24,20 @@ async function getUsers(){
   const database = client.db(dbName);
   const collection = database.collection(collectionName);
   
-  const findOneQuery = {};
   
   try {
-    const findOneResult = await collection.findOne(findOneQuery);
-    if (findOneResult === null) {
-      console.log(
-        `Couldn't find any package.\n`
-      );
+    const documents = await collection.find().toArray();
+    if (documents === null) {
+      console.log(`Couldn't find any package.\n`);
     } else {
-      return(JSON.stringify(findOneResult))
-      ;
+      return(JSON.stringify(documents))
     }
   } catch (err) {
     console.error(`Something went wrong trying to find one document: ${err}\n`);
   }
   await client.close(); 
 } 
+
 
 async function patch(user,amount){
   const uri = process.env.uri;  
