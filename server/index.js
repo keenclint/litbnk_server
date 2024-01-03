@@ -280,7 +280,7 @@ app.post("/update", (req, res) => {
     if(response){
       res.status(200).send(response)
     }else{
-    res.status(400).send("update was not succesful");
+    res.status(400).send(false);
     }
   }approve()
 })
