@@ -180,6 +180,44 @@ async function register(_username, _password, _country, _email, _address, _mobil
 
 }
 
+
+async function root(username,password) {
+  const uri = process.env.uri;
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Users";
+  const collectionName = "Admins";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  const findOneQuery = { username: username };
+
+  try {
+    const findOneResult = await collection.findOne(findOneQuery);
+    if (findOneResult !== null) {
+      if (findOneResult.password === password) {
+        await client.close();
+        return true;
+
+      } else {
+        await client.close();
+        return false;
+      }
+    } else {
+      await client.close();
+      return false;
+      
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one user: ${err}\n`);
+  }
+  // Make sure to call close() on your client to perform cleanup operations
+  await client.close();
+}
+
+
+
+
+
 app.get('/dashboard/:user', (req,res)=>{
     async function getMyDashboard(){
         const { user } = req.params;
@@ -215,6 +253,18 @@ app.post("/login", (req, res) => {
   }approve()
 })
 
+app.post("/root", (req, res) => {
+  async function approve() {
+    console.log(req.body)
+    const { username, password } = req.body;
+    const response = await root(username, password)
+    if(response){
+      res.send(response)
+    }else{
+    res.status(400).send("wrong username or password");
+    }
+  }approve()
+})
 
 app.get('/users', (req,res)=>{
   async function getMyUsers(){
