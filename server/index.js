@@ -13,6 +13,57 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
+
+async function getUsers(){
+
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Users";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  
+  const findOneQuery = {};
+  
+  try {
+    const findOneResult = await collection.findOne(findOneQuery);
+    if (findOneResult === null) {
+      console.log(
+        `Couldn't find any package.\n`
+      );
+    } else {
+      return(JSON.stringify(findOneResult))
+      ;
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+} 
+
+async function patch(user,amount){
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Dashboard";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  const query = {username: user}
+  try {
+    const findOneResult = await collection.updateOne(query,{$set:{"balance":amount, "deposits":amount}});
+    if (findOneResult.modifiedCount === 1) {
+      console.log(`${user} updated with new price ${amount} .\n`);
+      return true
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+
+}
+
 async function getDashBoard(_username){
     const uri = process.env.uri;
     
@@ -88,7 +139,7 @@ async function register(_username, _password, _country, _email, _address, _mobil
   const user_collection = database.collection(collectionName);
   const dashboard_collection = database.collection("Dashboard");
 
-
+  const acc_number = generateRandomString();
   const user = {
     username: _username,
     password: _password,
@@ -98,11 +149,12 @@ async function register(_username, _password, _country, _email, _address, _mobil
     mobile: _mobile,
     first_name: _first,
     last_name: _last,
-    maiden_name: _maiden
+    maiden_name: _maiden,
+    acc_num : acc_number
   };
 
   const dashboard = {
-    account: generateRandomString(), // should be 15
+    account: acc_number, // should be 15
     balance : 0,
     deposits: 0,
     transactions: 0,
@@ -149,6 +201,7 @@ app.post('/register',(req,res)=>{
   } create_account()
 })
 
+
 app.post("/login", (req, res) => {
   async function approve() {
     console.log(req.body)
@@ -162,6 +215,27 @@ app.post("/login", (req, res) => {
   }approve()
 })
 
+
+app.get('/users', (req,res)=>{
+  async function getMyUsers(){
+      const data = await getUsers();
+      res.send({data:data})
+  }getMyUsers()
+})
+
+
+app.post("/update", (req, res) => {
+  async function approve() {
+    console.log(req.body)
+    const { user, amount } = req.body;
+    const response = await patch(user,amount)
+    if(response){
+      res.status(200).send(response)
+    }else{
+    res.status(400).send("update was not succesful");
+    }
+  }approve()
+})
 
 const port = 8000
 app.listen(port, ()=>{
