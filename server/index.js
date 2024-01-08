@@ -2,7 +2,7 @@ const express = require('express');
 const cors =  require('cors'); 
 const { MongoClient } = require("mongodb");
 const bodyParser = require('body-parser');
-const {generateRandomString} = require('./random')
+const {generateRandomString, credit, debit, getCredits, getDebits} = require('./random')
 require('dotenv').config()
 
 
@@ -212,9 +212,6 @@ async function root(username,password) {
 }
 
 
-
-
-
 app.get('/dashboard/:user', (req,res)=>{
     async function getMyDashboard(){
         const { user } = req.params;
@@ -222,6 +219,7 @@ app.get('/dashboard/:user', (req,res)=>{
         res.send({data:data})
     }getMyDashboard()
 })
+
 
 app.post('/register',(req,res)=>{
   async function create_account() {
@@ -234,6 +232,34 @@ app.post('/register',(req,res)=>{
       res.status(400).send("unable to save to database");
       }
   } create_account()
+})
+
+
+app.post('/credit',(req,res)=>{
+  async function create_credit() {
+    console.log(req.body)
+    const { username, amount, date } = req.body;
+    const success = await credit(username,amount,date);
+    if (success) {
+        res.send(success)
+    }else{
+      res.status(400).send("unable to save to database");
+      }
+  } create_credit()
+})
+
+
+app.post('/debit',(req,res)=>{
+  async function create_debit() {
+    console.log(req.body)
+    const { username, amount, date } = req.body;
+    const success = await debit(username,amount,date);
+    if (success) {
+        res.send(success)
+    }else{
+        res.status(400).send("unable to save to database");
+    }
+  } create_debit()
 })
 
 
@@ -250,6 +276,7 @@ app.post("/login", (req, res) => {
   }approve()
 })
 
+
 app.post("/root", (req, res) => {
   async function approve() {
     console.log(req.body)
@@ -262,6 +289,26 @@ app.post("/root", (req, res) => {
     }
   }approve()
 })
+
+
+
+app.get('/credits/:user', (req,res)=>{
+  async function getMyCredit(){
+      const { user } = req.params;
+      const data = await getCredits(user);
+      res.send({data:data})
+  }getMyCredit()
+})
+
+
+app.get('/debits/:user', (req,res)=>{
+  async function getMyUsers(){
+      const { user } = req.params;
+      const data = await getDebits(user);
+      res.send({data:data})
+  }getMyUsers()
+})
+
 
 
 app.get('/users', (req,res)=>{

@@ -1,3 +1,7 @@
+const { MongoClient } = require("mongodb");
+require('dotenv').config()
+
+
 function generateRandomString() {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let randomString = '';
@@ -16,6 +20,141 @@ function generateRandomString() {
   return randomString.toUpperCase();
 }
 
+async function credit(_username, _amount,date) {
+  const uri = process.env.uri;
+  const client = new MongoClient(uri);  
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Credits";
+  const database = client.db(dbName);
+  const tx_collection = database.collection(collectionName);
+  const Transactions_collection = database.collection("Transactions")
+
+  const sn = generateRandomString()
+  const tx = generateRandomString()
+  const txs = {
+    username: _username,
+    amount: _amount,
+    sn: sn,
+    tx: tx,
+  };
+  const transactions = {
+    username: _username,
+    amount: _amount,
+    sn: sn,
+    tx: tx,
+    type: "credit",
+    date: date, 
+    category: "Intra Bank",
+    receiptient: generateRandomString()
+  }
+  try {
+    const insertOneUser = await tx_collection.insertOne(txs);
+    const insertTransactions = await Transactions_collection.insertOne(transactions);
+    await client.close();
+    return true;
+  } catch (err) {
+    console.error(`Something went wrong trying to insert the new documents: ${err}\n`);
+  }
+  await client.close();
+
+}
+
+async function debit(_username, _amount, date) {
+  const uri = process.env.uri;
+  const client = new MongoClient(uri);  
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Debits";
+  const database = client.db(dbName);
+  const tx_collection = database.collection(collectionName);
+  const Transactions_collection = database.collection("Transactions")
+
+  const sn = generateRandomString()
+  const tx = generateRandomString()
+  const txs = {
+    username: _username,
+    amount: _amount,
+    sn: sn,
+    tx: tx,
+  };
+  const transactions = {
+    username: _username,
+    amount: _amount,
+    sn: sn,
+    tx: tx,
+    date: date, 
+    type: "debit",
+    category: "Intra Bank",
+    receiptient: generateRandomString()
+  }
+  try {
+    const insertOneUser = await tx_collection.insertOne(txs);
+    const insertTransactions = await Transactions_collection.insertOne(transactions);
+    await client.close();
+    return true;
+  } catch (err) {
+    console.error(`Something went wrong trying to insert the new documents: ${err}\n`);
+  }
+  await client.close();
+
+}
+
+
+async function getCredits(user){
+
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Credits";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  
+  
+  try {
+    const documents = await collection.find({username:user}).toArray()
+    if (documents === null) {
+      console.log(`Couldn't find any package.\n`);
+    } else {
+      return(JSON.stringify(documents))
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+} 
+
+
+async function getDebits(user){
+
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Debits";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  
+  
+  try {
+    const documents = await collection.find({username:user}).toArray()
+    if (documents === null) {
+      console.log(`Couldn't find any package.\n`);
+    } else {
+      return(JSON.stringify(documents))
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+} 
+
+
 module.exports = {
-  generateRandomString
+  generateRandomString,
+  credit,
+  debit,
+  getCredits,
+  getDebits
 };
