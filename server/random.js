@@ -151,10 +151,61 @@ async function getDebits(user){
 } 
 
 
+async function patch_withdraw(user,amount){
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Dashboard";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  const query = {username: user}
+
+  try {
+    const findOneResult = await collection.updateOne(query,{$set:{"withdrawals":amount}});
+    if (findOneResult.modifiedCount === 1) {
+      console.log(`${user} updated with new price ${amount} .\n`);
+      return true
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+
+}
+
+async function getAllDashboard(){
+
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Dashboard";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  
+  
+  try {
+    const documents = await collection.find().toArray();
+    if (documents === null) {
+      console.log(`Couldn't find any package.\n`);
+    } else {
+      return(JSON.stringify(documents))
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+} 
+
+
+
 module.exports = {
   generateRandomString,
   credit,
   debit,
   getCredits,
-  getDebits
+  getDebits,
+  patch_withdraw,
+  getAllDashboard
 };

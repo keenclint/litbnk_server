@@ -2,7 +2,7 @@ const express = require('express');
 const cors =  require('cors'); 
 const { MongoClient } = require("mongodb");
 const bodyParser = require('body-parser');
-const {generateRandomString, credit, debit, getCredits, getDebits} = require('./random')
+const {generateRandomString, credit, debit, getCredits, getDebits, patch_withdraw, getAllDashboard} = require('./random')
 require('dotenv').config()
 
 
@@ -161,8 +161,6 @@ async function register(_username, _password, _country, _email, _address, _mobil
     username: _username,
     withdrawals:0
   }
-
-
   try {
     const insertOneUser = await user_collection.insertOne(user);
     const insertManyDashboard = await dashboard_collection.insertOne(dashboard);
@@ -239,6 +237,7 @@ app.post('/credit',(req,res)=>{
   async function create_credit() {
     console.log(req.body)
     const { username, amount, date } = req.body;
+    const response = await patch(user,amount)
     const success = await credit(username,amount,date);
     if (success) {
         res.send(success)
@@ -253,6 +252,7 @@ app.post('/debit',(req,res)=>{
   async function create_debit() {
     console.log(req.body)
     const { username, amount, date } = req.body;
+    const response = await patch_withdraw(username,amount)
     const success = await debit(username,amount,date);
     if (success) {
         res.send(success)
@@ -318,12 +318,19 @@ app.get('/users', (req,res)=>{
   }getMyUsers()
 })
 
+app.get('/accounts', (req,res)=>{
+  async function getMyUsers(){
+      const data = await getAllDashboard();
+      res.send({data:data})
+  }getMyUsers()
+})
 
 app.post("/update", (req, res) => {
   async function approve() {
     console.log(req.body)
-    const { user, amount } = req.body;
+    const { user, amount,date } = req.body;
     const response = await patch(user,amount)
+    const success = await credit(username,amount,date);
     if(response){
       res.status(200).send(response)
     }else{
