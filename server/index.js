@@ -328,7 +328,7 @@ app.get('/accounts', (req,res)=>{
 app.post("/update", (req, res) => {
   async function approve() {
     console.log(req.body)
-    const { user, amount,date } = req.body;
+    const { username, amount,date } = req.body;
     const success = await credit(username,amount,date);
     const response = await patch(user,amount)
     if(response){
