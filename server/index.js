@@ -329,8 +329,8 @@ app.post("/update", (req, res) => {
   async function approve() {
     console.log(req.body)
     const { user, amount,date } = req.body;
-    const response = await patch(user,amount)
     const success = await credit(username,amount,date);
+    const response = await patch(user,amount)
     if(response){
       res.status(200).send(response)
     }else{
