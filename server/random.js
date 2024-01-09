@@ -231,5 +231,6 @@ module.exports = {
   getCredits,
   getDebits,
   patch_withdraw,
-  getAllDashboard
+  getAllDashboard,
+  getTransactions
 };
