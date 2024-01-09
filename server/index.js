@@ -2,7 +2,10 @@ const express = require('express');
 const cors =  require('cors'); 
 const { MongoClient } = require("mongodb");
 const bodyParser = require('body-parser');
-const {generateRandomString, credit, debit, getCredits, getDebits, patch_withdraw, getAllDashboard} = require('./random')
+const {
+  generateRandomString, credit, debit, getCredits, 
+  getDebits, patch_withdraw, getAllDashboard, getTransactions
+} = require('./random')
 require('dotenv').config()
 
 
