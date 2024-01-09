@@ -219,6 +219,16 @@ app.get('/dashboard/:user', (req,res)=>{
 })
 
 
+app.get('/transactions/:user', (req,res)=>{
+  async function getMyTransactions(){
+      const { user } = req.params;
+      const data = await getTransactions(user);
+      res.send({data:data})
+  }getMyTransactions()
+})
+
+
+
 app.post('/register',(req,res)=>{
   async function create_account() {
     console.log(req.body)

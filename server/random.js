@@ -198,6 +198,30 @@ async function getAllDashboard(){
   await client.close(); 
 } 
 
+async function getTransactions(user){
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Transactions";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  const query = {username: user}
+  try {
+    const documents = await collection.find(query).toArray()
+    if (documents === null) {
+      console.log(`Couldn't find any package.\n`);
+    } else {
+      return(JSON.stringify(documents))
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close();
+}
+
+
+
 
 
 module.exports = {
