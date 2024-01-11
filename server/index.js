@@ -3,8 +3,9 @@ const cors =  require('cors');
 const { MongoClient } = require("mongodb");
 const bodyParser = require('body-parser');
 const {
-  generateRandomString, credit, debit, getCredits, 
-  getDebits, patch_withdraw, getAllDashboard, getTransactions
+  generateRandomString, credit, debit, 
+  getCredits, getDebits, patch_withdraw, 
+  getAllDashboard, getTransactions, getUser
 } = require('./random')
 require('dotenv').config()
 
@@ -231,7 +232,6 @@ app.get('/transactions/:user', (req,res)=>{
 })
 
 
-
 app.post('/register',(req,res)=>{
   async function create_account() {
     console.log(req.body)
@@ -331,6 +331,15 @@ app.get('/users', (req,res)=>{
   }getMyUsers()
 })
 
+
+app.get('/user/:user', (req,res)=>{
+  async function getMyUser(){
+      const { user } = req.params;
+      const data = await getUser(user);
+      res.send({data:data})
+  }getMyUser()
+})
+
 app.get('/accounts', (req,res)=>{
   async function getMyUsers(){
       const data = await getAllDashboard();
@@ -341,7 +350,7 @@ app.get('/accounts', (req,res)=>{
 app.post("/update", (req, res) => {
   async function approve() {
     console.log(req.body)
-    const { username, amount,date } = req.body;
+    const { user, amount,date } = req.body;
     const success = await credit(username,amount,date);
     const response = await patch(user,amount)
     if(response){
