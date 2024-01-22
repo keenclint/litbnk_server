@@ -5,7 +5,8 @@ const bodyParser = require('body-parser');
 const {
   generateRandomString, credit, debit, 
   getCredits, getDebits, patch_withdraw, 
-  getAllDashboard, getTransactions, getUser
+  getAllDashboard, getTransactions, getUser,
+  create_bene, create_other_bene,
 } = require('./random')
 require('dotenv').config()
 
@@ -360,6 +361,33 @@ app.post("/update", (req, res) => {
     }
   }approve()
 })
+
+app.post("/create_beneficiary", (req, res) => {
+  async function approve() {
+    console.log(req.body)
+    const { username, account_name, account_number, short_name } = req.body;
+    const success = await create_bene(username,account_name,account_number,short_name);
+    if(success){
+      res.status(200).send(success)
+    }else{
+    res.status(400).send(false);
+    }
+  }approve()
+})
+
+app.post("/other_beneficiary", (req, res) => {
+  async function approve() {
+    console.log(req.body)
+    const { username,bank_name,sort_code,routing_number, account_name, account_number, short_name } = req.body;
+    const success = await create_other_bene(username, bank_name, sortcode, routing_number, account_name,account_number,short_name);
+    if(success){
+      res.status(200).send(success)
+    }else{
+    res.status(400).send(false);
+    }
+  }approve()
+})
+
 
 const port = 8000
 app.listen(port, ()=>{

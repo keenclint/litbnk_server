@@ -245,6 +245,61 @@ async function getUser(user){
   await client.close(); 
 } 
 
+async function create_bene(username,account_name,account_number,short_name ) {
+  const uri = process.env.uri;
+  const client = new MongoClient(uri);  
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Beneficiaries";
+  const database = client.db(dbName);
+  const user_collection = database.collection(collectionName);
+  const user = {
+    username: username,
+    short_name: short_name,
+    account_name: account_name,
+    account_number : account_number
+  };
+
+  try {
+    const insertOneUser = await user_collection.insertOne(user);
+    await client.close();
+    return true;
+  } catch (err) {
+    console.error(`Something went wrong trying to insert the new documents: ${err}\n`);
+  }
+  await client.close();
+
+}
+
+
+async function create_other_bene(username,bank_name,sort_code,routing_number,account_name,account_number,short_name ) {
+  const uri = process.env.uri;
+  const client = new MongoClient(uri);  
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "OutsideBeneficiaries";
+  const database = client.db(dbName);
+  const user_collection = database.collection(collectionName);
+  const user = {
+    username: username,
+    bank_name:bank_name,
+    sort_code:sort_code,
+    routing_number:routing_number,
+    short_name: short_name,
+    account_name: account_name,
+    account_number : account_number
+  };
+
+  try {
+    const insertOneUser = await user_collection.insertOne(user);
+    await client.close();
+    return true;
+  } catch (err) {
+    console.error(`Something went wrong trying to insert the new documents: ${err}\n`);
+  }
+  await client.close();
+
+}
 
 
 
@@ -258,4 +313,6 @@ module.exports = {
   getAllDashboard,
   getTransactions,
   getUser,
+  create_bene,
+  create_other_bene,
 };
