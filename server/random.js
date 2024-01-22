@@ -125,9 +125,57 @@ async function getCredits(user){
   await client.close(); 
 } 
 
+async function getIntraBeneficiaries(user){
+
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Beneficiaries";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  
+  
+  try {
+    const documents = await collection.find({username:user}).toArray()
+    if (documents === null) {
+      console.log(`Couldn't find any package.\n`);
+    } else {
+      return(JSON.stringify(documents))
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+} 
+
+async function getInterBeneficiaries(user){
+
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "OutsideBeneficiaries";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  
+  
+  try {
+    const documents = await collection.find({username:user}).toArray()
+    if (documents === null) {
+      console.log(`Couldn't find any package.\n`);
+    } else {
+      return(JSON.stringify(documents))
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+} 
+
+
 
 async function getDebits(user){
-
   const uri = process.env.uri;  
   const client = new MongoClient(uri);
   await client.connect();
@@ -315,4 +363,6 @@ module.exports = {
   getUser,
   create_bene,
   create_other_bene,
+  getIntraBeneficiaries,
+  getInterBeneficiaries,
 };

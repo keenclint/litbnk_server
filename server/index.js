@@ -6,7 +6,8 @@ const {
   generateRandomString, credit, debit, 
   getCredits, getDebits, patch_withdraw, 
   getAllDashboard, getTransactions, getUser,
-  create_bene, create_other_bene,
+  create_bene, create_other_bene,getIntraBeneficiaries,
+  getInterBeneficiaries,
 } = require('./random')
 require('dotenv').config()
 
@@ -313,6 +314,24 @@ app.get('/credits/:user', (req,res)=>{
       res.send({data:data})
   }getMyCredit()
 })
+
+
+app.get('/beneficiaries/:user', (req,res)=>{
+  async function getMyCredit(){
+      const { user } = req.params;
+      const data = await getIntraBeneficiaries(user);
+      res.send({data:data})
+  }getMyCredit()
+})
+
+app.get('/inter_beneficiaries/:user', (req,res)=>{
+  async function getMyCredit(){
+      const { user } = req.params;
+      const data = await getInterBeneficiaries(user);
+      res.send({data:data})
+  }getMyCredit()
+})
+
 
 
 app.get('/debits/:user', (req,res)=>{
