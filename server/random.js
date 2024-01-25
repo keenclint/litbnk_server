@@ -293,6 +293,34 @@ async function getUser(user){
   await client.close(); 
 } 
 
+
+
+async function getAccountUser(acc){
+
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Users";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  const query = {acc_num: acc}  
+  try {
+    const documents = await collection.findOne(query);
+    if (documents === null) {
+      console.log(`Couldn't find any package.\n`);
+    } else {
+      return(JSON.stringify(documents))
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+} 
+
+
+
+
 async function create_bene(username,account_name,account_number,short_name ) {
   const uri = process.env.uri;
   const client = new MongoClient(uri);  
@@ -365,4 +393,5 @@ module.exports = {
   create_other_bene,
   getIntraBeneficiaries,
   getInterBeneficiaries,
+  getAccountUser,
 };

@@ -7,7 +7,7 @@ const {
   getCredits, getDebits, patch_withdraw, 
   getAllDashboard, getTransactions, getUser,
   create_bene, create_other_bene,getIntraBeneficiaries,
-  getInterBeneficiaries,
+  getInterBeneficiaries,getAccountUser,
 } = require('./random')
 require('dotenv').config()
 
@@ -359,6 +359,15 @@ app.get('/user/:user', (req,res)=>{
       res.send({data:data})
   }getMyUser()
 })
+
+app.get('/account_num/:acc', (req,res)=>{
+  async function getMyAcc(){
+      const { acc } = req.params;
+      const data = await getAccountUser(acc);
+      res.send({data:data})
+  }getMyAcc()
+})
+
 
 app.get('/accounts', (req,res)=>{
   async function getMyUsers(){
