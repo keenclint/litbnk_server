@@ -391,12 +391,14 @@ async function transfer(user,amount,receiver){
   const date = new Date().toDateString();
   try {
     const result = await collection.findOne(query);
-    const receiver_result = collection.findOne(receiver_query);
-    const receiver_new_balance = receiver_result.balance + amount ;
-    const prev_balance = result.balance
-    const new_balance = prev_balance - amount;
-    const SenderBalance = await collection.updateOne(query,{$set:{"balance":new_balance, "withdrawals":amount}});
-    const RecieverBalance = await collection.updateOne(receiver_query,{$set:{"balance":receiver_new_balance, "deposits":amount}});
+    const receiver_result = await collection.findOne(receiver_query);
+    const receiver_new_balance = parseInt(receiver_result.balance) + parseInt(amount) ;
+    const prev_balance = parseInt(result.balance)
+    const new_balance = prev_balance - parseInt(amount);
+    const new_withdrawal = parseInt(result.withdrawals) + parseInt(amount);
+    const new_deposits = parseInt(receiver_result.deposits) + parseInt(amount);
+    const SenderBalance = await collection.updateOne(query,{$set:{"balance":new_balance, "withdrawals":new_withdrawal}});
+    const RecieverBalance = await collection.updateOne(receiver_query,{$set:{"balance":receiver_new_balance, "deposits":new_deposits}});
 
     if(SenderBalance.modifiedCount === 1 && RecieverBalance.modifiedCount === 1) {
       console.log(`${user} updated with new price ${amount} .\n`);
