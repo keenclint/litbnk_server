@@ -378,6 +378,101 @@ async function create_other_bene(username,bank_name,sort_code,routing_number,acc
 }
 
 
+async function transfer(user,amount,receiver){
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Dashboard";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  const query = {username: user}
+  const receiver_query = {account:receiver}
+  const date = new Date().toDateString();
+  try {
+    const result = await collection.findOne(query);
+    const receiver_result = collection.findOne(receiver_query);
+    const receiver_new_balance = receiver_result.balance + amount ;
+    const prev_balance = result.balance
+    const new_balance = prev_balance - amount;
+    const SenderBalance = await collection.updateOne(query,{$set:{"balance":new_balance, "withdrawals":amount}});
+    const RecieverBalance = await collection.updateOne(receiver_query,{$set:{"balance":receiver_new_balance, "deposits":amount}});
+
+    if(SenderBalance.modifiedCount === 1 && RecieverBalance.modifiedCount === 1) {
+      console.log(`${user} updated with new price ${amount} .\n`);
+
+
+
+
+    const options = { ordered: true };
+    const tx_collection = database.collection("Debits");
+    const tx_credit = database.collection("Credits")
+    const Transactions_collection = database.collection("Transactions")
+
+    const sn = generateRandomString()
+    const tx = generateRandomString()
+    const debit_txs = {
+      username: user,
+      amount: amount,
+      sn: sn,
+      tx: tx,
+      date: date
+    };
+    const credit_txs = {
+      username: receiver_result.username,
+      amount: amount,
+      sn: sn,
+      tx: tx,
+      date: date
+    };
+    const debit_transactions = {
+      username: user,
+      amount: amount,
+      sn: sn,
+      tx: tx,
+      date: date, 
+      type: "debit",
+      category: "Intra Bank",
+      receiptient: receiver
+    }
+    const credit_transactions = {
+      username: receiver_result.username,
+      amount: amount,
+      sn: sn,
+      tx: tx,
+      date: date, 
+      type: "credit",
+      category: "Intra Bank",
+      sender: result.account
+    }
+    try {
+      const insertDebit = await tx_collection.insertOne(debit_txs);
+      const insertCredit = await tx_credit.insertOne(credit_txs);
+      const insertTransactions = await Transactions_collection.insertMany([debit_transactions,credit_transactions],options);
+    } catch (err) {
+      console.error(`Something went wrong trying to insert the new documents: ${err}\n`);
+    }
+
+
+
+
+
+
+
+
+      return true
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+
+}
+
+
+
+
+
 
 module.exports = {
   generateRandomString,
@@ -394,4 +489,5 @@ module.exports = {
   getIntraBeneficiaries,
   getInterBeneficiaries,
   getAccountUser,
+  transfer
 };

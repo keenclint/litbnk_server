@@ -7,7 +7,7 @@ const {
   getCredits, getDebits, patch_withdraw, 
   getAllDashboard, getTransactions, getUser,
   create_bene, create_other_bene,getIntraBeneficiaries,
-  getInterBeneficiaries,getAccountUser,
+  getInterBeneficiaries,getAccountUser,transfer
 } = require('./random')
 require('dotenv').config()
 
@@ -415,6 +415,24 @@ app.post("/other_beneficiary", (req, res) => {
     }
   }approve()
 })
+
+
+app.post("/transfer", (req, res) => {
+  async function approve() {
+    console.log(req.body)
+    const { user, amount, receiver } = req.body;
+    const response = await transfer(user,amount,receiver)
+    if(response){
+      res.status(200).send(response)
+    }else{
+    res.status(400).send(false);
+    }
+  }approve()
+})
+
+
+
+
 
 
 const port = 8000
