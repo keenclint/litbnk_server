@@ -417,14 +417,14 @@ async function transfer(user,amount,receiver){
       username: user,
       amount: amount,
       sn: sn,
-      tx: tx,
+      tx: receiver,
       date: date
     };
     const credit_txs = {
       username: receiver_result.username,
       amount: amount,
       sn: sn,
-      tx: tx,
+      tx: result.account,
       date: date
     };
     const debit_transactions = {
