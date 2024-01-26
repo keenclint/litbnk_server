@@ -210,7 +210,7 @@ async function patch_withdraw(user,amount){
   const query = {username: user}
 
   try {
-    const findOneResult = await collection.updateOne(query,{$set:{"withdrawals":amount}});
+    const findOneResult = await collection.updateOne(query,{$set:{"withdrawals":parseInt(amount)}});
     if (findOneResult.modifiedCount === 1) {
       console.log(`${user} updated with new price ${amount} .\n`);
       return true
