@@ -67,6 +67,31 @@ async function patch(user,amount){
 
 }
 
+
+async function onHold(user){
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Dashboard";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  const query = {username: user}
+  try {
+    const findOneResult = await collection.updateOne(query,{$set:{"active":"false"}});
+    if (findOneResult.modifiedCount === 1) {
+      console.log(`${user} updated with hold on account .\n`);
+      return true
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+
+}
+
+
+
 async function getDashBoard(_username){
     const uri = process.env.uri;
     
@@ -370,6 +395,7 @@ app.get('/account_num/:acc', (req,res)=>{
 })
 
 
+
 app.get('/accounts', (req,res)=>{
   async function getMyUsers(){
       const data = await getAllDashboard();
@@ -381,7 +407,7 @@ app.post("/update", (req, res) => {
   async function approve() {
     console.log(req.body)
     const { user, amount,date } = req.body;
-    const success = await credit(username,amount,date);
+    const success = await credit(user,amount,date);
     const response = await patch(user,amount)
     if(response){
       res.status(200).send(response)
@@ -390,6 +416,23 @@ app.post("/update", (req, res) => {
     }
   }approve()
 })
+
+
+
+app.post("/hold", (req, res) => {
+  async function approve() {
+    console.log(req.body)
+    const { user } = req.body;
+    const response = await onHold(user)
+    if(response){
+      res.status(200).send(response)
+    }else{
+    res.status(400).send(false);
+    }
+  }approve()
+})
+
+
 
 app.post("/create_beneficiary", (req, res) => {
   async function approve() {
