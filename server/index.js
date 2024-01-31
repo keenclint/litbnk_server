@@ -165,7 +165,8 @@ async function register(_username, _password, _country, _email, _address, _mobil
     dps: 0,
     loan: 0,
     username: _username,
-    withdrawals:0
+    withdrawals:0,
+    active: "true"
   }
   try {
     const insertOneUser = await user_collection.insertOne(user);
