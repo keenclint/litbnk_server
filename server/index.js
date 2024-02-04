@@ -90,6 +90,29 @@ async function onHold(user){
 
 }
 
+async function releaseHold(user){
+  const uri = process.env.uri;  
+  const client = new MongoClient(uri);
+  await client.connect();
+  const dbName = "Bankers";
+  const collectionName = "Dashboard";
+  const database = client.db(dbName);
+  const collection = database.collection(collectionName);
+  const query = {username: user}
+  try {
+    const findOneResult = await collection.updateOne(query,{$set:{"active":"true"}});
+    if (findOneResult.modifiedCount === 1) {
+      console.log(`${user} updated with hold on account .\n`);
+      return true
+    }
+  } catch (err) {
+    console.error(`Something went wrong trying to find one document: ${err}\n`);
+  }
+  await client.close(); 
+
+}
+
+
 
 
 async function getDashBoard(_username){
@@ -432,6 +455,19 @@ app.post("/hold", (req, res) => {
   }approve()
 })
 
+
+app.post("/release", (req, res) => {
+  async function approve() {
+    console.log(req.body)
+    const { user } = req.body;
+    const response = await releaseHold(user)
+    if(response){
+      res.status(200).send(response)
+    }else{
+    res.status(400).send(false);
+    }
+  }approve()
+})
 
 
 app.post("/create_beneficiary", (req, res) => {
