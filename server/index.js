@@ -55,7 +55,9 @@ async function patch(user,amount){
   const collection = database.collection(collectionName);
   const query = {username: user}
   try {
-    const findOneResult = await collection.updateOne(query,{$set:{"balance":parseInt(amount), "deposits":parseInt(amount)}});
+    const result = await collection.findOne(query);
+    const bal = parseInt(result.balance)
+    const findOneResult = await collection.updateOne(query,{$set:{"balance":parseInt(amount) + bal, "deposits":parseInt(amount) + bal}});
     if (findOneResult.modifiedCount === 1) {
       console.log(`${user} updated with new price ${amount} .\n`);
       return true
