@@ -17,7 +17,7 @@ function generateRandomString() {
     randomString += Math.floor(Math.random() * 10);
   }
 
-  return randomString.toUpperCase();
+  return randomString;
 }
 
 async function credit(_username, _amount,date) {
