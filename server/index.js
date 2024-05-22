@@ -502,7 +502,7 @@ app.post("/update", (req, res) => {
 
 
 
-
+// reject account from transfer
 app.post("/hold", (req, res) => {
   async function approve() {
     console.log(req.body)
@@ -516,7 +516,7 @@ app.post("/hold", (req, res) => {
   }approve()
 })
 
-
+// reject account from login
 app.post("/hold_account", (req, res) => {
   async function approve() {
     console.log(req.body)
@@ -531,7 +531,7 @@ app.post("/hold_account", (req, res) => {
 })
 
 
-
+// release account from transfer hold
 app.post("/release", (req, res) => {
   async function approve() {
     console.log(req.body)
@@ -546,7 +546,7 @@ app.post("/release", (req, res) => {
 })
 
 
-
+// release account from login hold
 app.post("/release_account", (req, res) => {
   async function approve() {
     console.log(req.body)
