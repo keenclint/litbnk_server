@@ -215,8 +215,8 @@ async function login(username,password) {
     if (findOneResult !== null) {
       if (findOneResult.password === password) {
         await client.close();
-        return true;
-
+        return findOneResult ;
+        //return true;
       } else {
         await client.close();
         return false;
