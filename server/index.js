@@ -11,6 +11,12 @@ const {
 } = require('./random')
 require('dotenv').config()
 
+const pinataSDK = require('@pinata/sdk');
+const { Readable } =  require('stream')
+const multer = require('multer');
+
+const upload = multer();
+
 
 const app = express()
 app.use(cors())
@@ -18,6 +24,43 @@ app.use(express.json())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+const pinataApiKey = '3cc1438cb9472037c822';
+const pinataApiSecret = '3cac6af98f0b3a69a00aa6b3c6948876a465d15e9b36388a77efef8348ca8c21';
+const pinata = new pinataSDK(pinataApiKey, pinataApiSecret);
+async function storeImages(file, name) {
+  console.log('Uploading to IPFS');
+  const options = {
+    pinataMetadata: {
+      name,
+    },
+  };
+  try {
+    const result = await pinata.pinFileToIPFS(file, options);
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+class BufferStream extends Readable {
+  buffer;
+  sent;
+  constructor(buffer) {
+    super();
+    this.buffer = buffer;
+    this.sent = false;
+  }
+
+  _read() {
+    if (!this.sent) {
+      this.push(this.buffer);
+      this.sent = true;
+    } else {
+      this.push(null);
+    }
+  }
+}
 
 
 async function getUsers(){
@@ -234,7 +277,7 @@ async function login(username,password) {
 }
 
 
-async function register(_username, _password, _country, _email, _address, _mobile, _first, _last, _maiden) {
+async function register(_username, _password, _country, _email, _address, _mobile, _first, _last, _maiden, _image) {
   const uri = process.env.uri;
   const client = new MongoClient(uri);  
   await client.connect();
@@ -256,6 +299,7 @@ async function register(_username, _password, _country, _email, _address, _mobil
     last_name: _last,
     maiden_name: _maiden,
     acc_num : acc_number,
+    image: _image,
     active: "true"
   };
 
@@ -338,11 +382,19 @@ app.get('/transactions/:user', (req,res)=>{
 })
 
 
-app.post('/register',(req,res)=>{
+app.post('/register', upload.single('file'),(req,res)=>{
   async function create_account() {
-    console.log(req.body)
+    let image_url = undefined
+    if (req.file !== undefined) {
+      //console.log(req.file.buffer)
+      const image_stream = new BufferStream(req.file.buffer);
+      const url = await storeImages(image_stream,req.file.originalname);
+      console.log("url: ",url)
+      image_url = "https://ipfs.io/ipfs/"+url.IpfsHash
+      console.log("url: ",image_url)
+    }
     const { username, password, country, email, address, mobile,first_name,last_name,maiden_name } = req.body;
-    const success = await register(username,password,country,email,address,mobile,first_name,last_name,maiden_name);
+    const success = await register(username,password,country,email,address,mobile,first_name,last_name,maiden_name,image_url);
     if (success) {
         res.send(success)
     }else{
